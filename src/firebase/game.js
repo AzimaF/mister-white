@@ -99,7 +99,7 @@ export const createRoom = async (hostUser, settings) => {
 };
 
 // Gabung room sebagai guest / auth user
-export const joinRoom = async (roomCode, playerName, authUid = null) => {
+export const joinRoom = async (roomCode, playerName, authUid = null, customAvatarUrl = null) => {
   const code = roomCode.toUpperCase();
   const roomRef = ref(db, `rooms/${code}`);
   const snapshot = await get(roomRef);
@@ -123,7 +123,9 @@ export const joinRoom = async (roomCode, playerName, authUid = null) => {
     }
   } catch (err) {}
 
-  if (!avatarUrl) {
+  if (customAvatarUrl) {
+    avatarUrl = customAvatarUrl;
+  } else if (!avatarUrl) {
     avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(playerName)}`;
   }
 

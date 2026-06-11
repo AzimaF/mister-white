@@ -400,6 +400,14 @@ export default function GamePage() {
     const sortedPlayers = [...players].sort((a, b) => (b.score || 0) - (a.score || 0));
     const winner = room.winner ? room.players?.[room.winner] : null;
 
+    // Hitung rekapitulasi suara
+    const voteCounts = {};
+    if (room.votes) {
+      Object.values(room.votes).forEach((targetId) => {
+        voteCounts[targetId] = (voteCounts[targetId] || 0) + 1;
+      });
+    }
+
     return (
       <div className="game-page">
         <div className="game-deco-1" />
@@ -414,6 +422,32 @@ export default function GamePage() {
               {kickedPlayer ? `${kickedPlayer.name} (${room.kickedRole === 'mrwhite' ? 'Mr. White' : 'Civilian'}) dikeluarkan!` : ''}
             </div>
           </div>
+
+          {/* Vote Results */}
+          {Object.keys(voteCounts).length > 0 && (
+            <div className="vote-tally-card" style={{ background: 'var(--clr-card)', padding: '20px', borderRadius: 'var(--radius-xl)', marginBottom: '20px', boxShadow: 'var(--shadow-card)' }}>
+              <div style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '16px', textAlign: 'center' }}>🗳️ Rekapitulasi Suara</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {Object.entries(voteCounts).sort((a, b) => b[1] - a[1]).map(([targetId, count]) => {
+                  const targetP = room.players?.[targetId];
+                  if (!targetP) return null;
+                  return (
+                    <div key={targetId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--clr-surface)', padding: '10px 16px', borderRadius: 'var(--radius-md)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {targetP.avatar ? (
+                          <img src={targetP.avatar} alt="avatar" style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }} />
+                        ) : (
+                          <span>👤</span>
+                        )}
+                        <span style={{ fontWeight: 600 }}>{targetP.name}</span>
+                      </div>
+                      <div style={{ fontWeight: 'bold', color: 'var(--clr-text)' }}>{count} Suara</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Word Reveal */}
           <div className="words-reveal-card">

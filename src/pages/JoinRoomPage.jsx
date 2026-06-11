@@ -13,6 +13,18 @@ export default function JoinRoomPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Avatar selector for guests
+  const avatarThemes = ['bottts', 'adventurer', 'avataaars', 'fun-emoji', 'lorelei', 'micah'];
+  const [avatarTheme, setAvatarTheme] = useState('bottts');
+  const [avatarSeed, setAvatarSeed] = useState(Math.random().toString(36).substring(7));
+
+  const handleRandomAvatar = () => {
+    const randomTheme = avatarThemes[Math.floor(Math.random() * avatarThemes.length)];
+    const randomSeed = Math.random().toString(36).substring(7);
+    setAvatarTheme(randomTheme);
+    setAvatarSeed(randomSeed);
+  };
+
   const handleJoin = async (e) => {
     e.preventDefault();
     if (!roomCode.trim() || !playerName.trim()) {
@@ -22,7 +34,8 @@ export default function JoinRoomPage() {
     setLoading(true);
     setError('');
     try {
-      const { code, guestId } = await joinRoom(roomCode.trim(), playerName.trim(), user?.uid);
+      const customAvatarUrl = !user ? `https://api.dicebear.com/7.x/${avatarTheme}/svg?seed=${avatarSeed}` : null;
+      const { code, guestId } = await joinRoom(roomCode.trim(), playerName.trim(), user?.uid, customAvatarUrl);
       if (!user) {
         sessionStorage.setItem('guestId', guestId);
         sessionStorage.setItem('guestName', playerName.trim());
@@ -90,6 +103,22 @@ export default function JoinRoomPage() {
                 />
               </div>
             </div>
+
+            {!user && (
+              <div className="join-avatar-section" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '20px' }}>
+                <label className="form-label">Avatar Kamu</label>
+                <div style={{ position: 'relative', width: 80, height: 80, borderRadius: '50%', backgroundColor: 'var(--clr-surface)', margin: '10px 0', border: '3px solid var(--clr-bg)' }}>
+                  <img 
+                    src={`https://api.dicebear.com/7.x/${avatarTheme}/svg?seed=${avatarSeed}`} 
+                    alt="Guest Avatar Preview" 
+                    style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
+                  />
+                </div>
+                <button type="button" className="btn btn-outline-white btn-sm" onClick={handleRandomAvatar} style={{ color: 'var(--clr-text-secondary)', borderColor: 'var(--clr-border)', background: 'white' }}>
+                  🎲 Acak Profil
+                </button>
+              </div>
+            )}
 
             <div className="form-group">
               <label className="form-label" htmlFor="player-name">Username Kamu</label>
