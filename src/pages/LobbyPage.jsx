@@ -54,8 +54,9 @@ export default function LobbyPage() {
   const handleStartGame = async () => {
     if (!isHost) return;
     const playerCount = Object.keys(room.players || {}).length;
-    if (playerCount < 2) {
-      setError('Minimal 2 pemain untuk mulai!');
+    const max = room.settings?.maxPlayers || 10;
+    if (playerCount < max) {
+      setError(`Room belum penuh! Kurang ${max - playerCount} pemain lagi.`);
       return;
     }
     setStarting(true);
@@ -223,6 +224,10 @@ export default function LobbyPage() {
                 const allReady = players.every(p => p.isHost || p.isReady);
                 const readyCount = players.filter(p => !p.isHost && p.isReady).length;
                 const guestCount = players.length - 1;
+                const max = room.settings?.maxPlayers || 10;
+                const isFull = players.length >= max;
+                const missingPlayers = max - players.length;
+
                 return (
                   <div className="host-controls">
                     {error && <div className="alert alert-error">{error}</div>}
@@ -230,15 +235,15 @@ export default function LobbyPage() {
                       id="btn-start-game"
                       className="host-start-btn"
                       onClick={handleStartGame}
-                      disabled={starting || players.length < 2 || !allReady}
+                      disabled={starting || !isFull || !allReady}
                     >
                       {starting ? (
                         <>
                           <div className="spinner" style={{ width: 20, height: 20, borderWidth: 2 }} />
                           Memulai...
                         </>
-                      ) : players.length < 2 ? (
-                        '⏳ Menunggu pemain lain...'
+                      ) : !isFull ? (
+                        `⏳ Menunggu ${missingPlayers} pemain lagi...`
                       ) : !allReady ? (
                         `⏳ Menunggu Pemain Siap (${readyCount}/${guestCount})`
                       ) : (
@@ -246,7 +251,7 @@ export default function LobbyPage() {
                       )}
                     </button>
                     <p className="host-tip">
-                      💡 Game hanya bisa dimulai jika semua pemain sudah mengeklik "Siap".
+                      💡 Game hanya bisa dimulai jika room penuh ({max} pemain) dan semua sudah mengeklik "Siap".
                     </p>
                   </div>
                 );

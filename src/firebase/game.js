@@ -163,6 +163,11 @@ export const startGame = async (roomCode, hostId) => {
 
   const { settings, players } = room;
 
+  const playerCount = Object.keys(players).length;
+  if (playerCount < settings.maxPlayers) {
+    throw new Error(`Pemain belum mencukupi batas maksimal room (${settings.maxPlayers} orang)!`);
+  }
+
   const { assignments, civilianWord, mrWhiteWord } = assignWords(
     players,
     settings.wordMode,
