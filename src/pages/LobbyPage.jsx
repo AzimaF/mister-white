@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { listenToRoom, startGame, deleteRoom, setPlayerOnline, setPlayerReady } from '../firebase/game';
+import { listenToRoom, startGame, deleteRoom, setPlayerOnline, setPlayerReady, leaveRoom, updatePlayerAvatar } from '../firebase/game';
 import './LobbyPage.css';
 
 export default function LobbyPage() {
@@ -75,15 +75,26 @@ export default function LobbyPage() {
     }
   };
 
-  const handleLeave = () => {
+  const handleLeave = async () => {
     if (isHost) {
       if (window.confirm('Kamu adalah host. Hapus room ini?')) {
-        deleteRoom(code);
+        await deleteRoom(code);
         navigate('/');
       }
     } else {
-      navigate('/');
+      if (window.confirm('Yakin ingin keluar dari room?')) {
+        await leaveRoom(code, myId);
+        navigate('/');
+      }
     }
+  };
+
+  const handleRandomizeAvatar = async () => {
+    const avatarThemes = ['bottts', 'adventurer', 'avataaars', 'fun-emoji', 'lorelei', 'micah'];
+    const randomTheme = avatarThemes[Math.floor(Math.random() * avatarThemes.length)];
+    const randomSeed = Math.random().toString(36).substring(7);
+    const newAvatarUrl = `https://api.dicebear.com/7.x/${randomTheme}/svg?seed=${randomSeed}`;
+    await updatePlayerAvatar(code, myId, newAvatarUrl);
   };
 
   if (loading) {
@@ -233,12 +244,25 @@ export default function LobbyPage() {
                 const isReady = myPlayer?.isReady;
                 return (
                   <div className="guest-controls">
-                    <button 
-                      className={`btn-ready-toggle ${isReady ? 'is-ready' : ''}`}
-                      onClick={handleToggleReady}
-                    >
-                      {isReady ? '❌ Batal Siap' : '✅ Saya Siap!'}
-                    </button>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <button 
+                        className={`btn-ready-toggle ${isReady ? 'is-ready' : ''}`}
+                        style={{ flex: 1 }}
+                        onClick={handleToggleReady}
+                      >
+                        {isReady ? '❌ Batal Siap' : '✅ Saya Siap!'}
+                      </button>
+                      
+                      {!user && (
+                        <button 
+                          className="btn btn-outline-white"
+                          style={{ color: 'var(--clr-text-secondary)', borderColor: 'var(--clr-border)', background: 'white', flex: 1, fontWeight: 'bold' }}
+                          onClick={handleRandomizeAvatar}
+                        >
+                          🎲 Acak Avatar
+                        </button>
+                      )}
+                    </div>
                     <div className="waiting-message" style={{ marginTop: '12px' }}>
                       <div className="waiting-dots">
                         <span /><span /><span />

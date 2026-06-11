@@ -142,6 +142,16 @@ export const joinRoom = async (roomCode, playerName, authUid = null, customAvata
   return { code, guestId: playerId };
 };
 
+// Keluar dari room
+export const leaveRoom = async (roomCode, playerId) => {
+  await remove(ref(db, `rooms/${roomCode}/players/${playerId}`));
+};
+
+// Update avatar pemain
+export const updatePlayerAvatar = async (roomCode, playerId, avatarUrl) => {
+  await update(ref(db, `rooms/${roomCode}/players/${playerId}`), { avatar: avatarUrl });
+};
+
 // Mulai game
 export const startGame = async (roomCode, hostId) => {
   const roomRef = ref(db, `rooms/${roomCode}`);
