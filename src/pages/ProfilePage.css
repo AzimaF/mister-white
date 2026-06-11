@@ -1,0 +1,112 @@
+/* src/pages/ProfilePage.css */
+.profile-page {
+  min-height: 100vh;
+  padding: var(--space-xl) var(--space-lg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile-card {
+  background: var(--clr-white);
+  width: 100%;
+  max-width: 480px;
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  box-shadow: var(--shadow-card);
+  animation: pop-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  position: relative;
+  z-index: 10;
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.profile-title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--clr-text);
+  margin-bottom: 8px;
+}
+
+.profile-avatar-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto var(--space-lg);
+}
+
+.profile-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--clr-bg);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  background-color: var(--clr-surface);
+}
+
+.profile-avatar-edit-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  background: var(--clr-bg);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  border: 3px solid var(--clr-white);
+  transition: all 0.2s;
+}
+
+.profile-avatar-edit-btn:hover {
+  transform: scale(1.1);
+}
+
+.profile-section {
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-xl);
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.profile-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.profile-section-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--clr-text);
+  margin-bottom: var(--space-md);
+}
+
+.file-input-hidden {
+  display: none;
+}
+
+.profile-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: var(--clr-surface);
+  color: var(--clr-text);
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  font-weight: 700;
+  margin-bottom: var(--space-xl);
+  transition: var(--transition-base);
+}
+
+.profile-back-btn:hover {
+  background: var(--clr-border);
+}

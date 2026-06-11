@@ -1,13 +1,15 @@
 // src/pages/JoinRoomPage.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { joinRoom } from '../firebase/game';
 import './JoinRoomPage.css';
 
 export default function JoinRoomPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [roomCode, setRoomCode] = useState('');
-  const [playerName, setPlayerName] = useState('');
+  const [playerName, setPlayerName] = useState(user?.displayName || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -20,9 +22,11 @@ export default function JoinRoomPage() {
     setLoading(true);
     setError('');
     try {
-      const { code, guestId } = await joinRoom(roomCode.trim(), playerName.trim());
-      sessionStorage.setItem('guestId', guestId);
-      sessionStorage.setItem('guestName', playerName.trim());
+      const { code, guestId } = await joinRoom(roomCode.trim(), playerName.trim(), user?.uid);
+      if (!user) {
+        sessionStorage.setItem('guestId', guestId);
+        sessionStorage.setItem('guestName', playerName.trim());
+      }
       sessionStorage.setItem('roomCode', code);
       navigate(`/room/${code}`);
     } catch (err) {

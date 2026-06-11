@@ -332,7 +332,11 @@ export default function GamePage() {
                     className={`vote-player-btn ${myVote === p.uid ? 'selected' : ''}`}
                     onClick={() => setMyVote(p.uid)}
                   >
-                    <div className="vote-player-emoji">🎭</div>
+                    {p.avatar ? (
+                      <img src={p.avatar} alt="avatar" className="vote-player-emoji" style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', padding: 0 }} />
+                    ) : (
+                      <div className="vote-player-emoji">🎭</div>
+                    )}
                     <div className="vote-player-name">{p.name}</div>
                     {myVote === p.uid && <div className="vote-check">✓</div>}
                   </button>
@@ -432,7 +436,12 @@ export default function GamePage() {
               {sortedPlayers.map((p, i) => (
                 <div key={p.uid} className={`leaderboard-item ${p.uid === myId ? 'me' : ''}`}>
                   <div className="leaderboard-rank">{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`}</div>
-                  <div className="leaderboard-player-name">{p.name}</div>
+                  {p.avatar ? (
+                    <img src={p.avatar} alt="avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  ) : (
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--clr-surface)' }} />
+                  )}
+                  <div className="leaderboard-player-name" style={{ marginLeft: 8 }}>{p.name}</div>
                   <div className="leaderboard-score">{p.score || 0} poin</div>
                 </div>
               ))}
@@ -631,7 +640,12 @@ export default function GamePage() {
                   return (
                     <div key={pid} className={`turn-item ${isCurrent ? 'current' : ''} ${isDone ? 'done' : ''}`}>
                       <div className="turn-number">{i + 1}</div>
-                      <div className="turn-player-name">
+                      {p?.avatar ? (
+                        <img src={p.avatar} alt="avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                      ) : (
+                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--clr-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>👤</div>
+                      )}
+                      <div className="turn-player-name" style={{ marginLeft: 8 }}>
                         {p?.name}
                         {pid === myId && <span style={{ opacity: 0.6, fontSize: '0.75rem' }}> (Saya)</span>}
                       </div>

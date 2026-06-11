@@ -13,8 +13,17 @@ const mockPlayers = [
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      if (logout) await logout();
+      navigate('/');
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleCreateRoom = () => {
     if (user) navigate('/create-room');
@@ -43,8 +52,11 @@ export default function LandingPage() {
                 <button className="btn btn-white btn-sm" onClick={() => navigate('/create-room')}>
                   🏠 Buat Room
                 </button>
-                <button className="btn btn-green btn-sm" onClick={() => navigate('/join')}>
-                  🔑 Gabung
+                <button className="btn btn-white btn-sm" onClick={() => navigate('/profile')}>
+                  👤 Profil
+                </button>
+                <button className="btn btn-green btn-sm" onClick={handleLogout}>
+                  🚪 Keluar
                 </button>
               </>
             ) : (
@@ -89,8 +101,11 @@ export default function LandingPage() {
                 <button className="btn btn-white" onClick={() => { navigate('/create-room'); setMobileMenuOpen(false); }}>
                   🏠 Buat Room
                 </button>
-                <button className="btn btn-green" onClick={() => { navigate('/join'); setMobileMenuOpen(false); }}>
-                  🔑 Gabung Game
+                <button className="btn btn-white" onClick={() => { navigate('/profile'); setMobileMenuOpen(false); }}>
+                  👤 Profil
+                </button>
+                <button className="btn btn-green" onClick={() => { handleLogout(); setMobileMenuOpen(false); }}>
+                  🚪 Keluar
                 </button>
               </>
             ) : (

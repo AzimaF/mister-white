@@ -60,6 +60,12 @@ export const createRoom = async (hostUser, settings) => {
     existing = await get(ref(db, `rooms/${code}`));
   }
 
+  let avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(hostUser.displayName || hostUser.email || 'Host')}`;
+  try {
+    const photoSnap = await get(ref(db, `users/${hostUser.uid}/photoData`));
+    if (photoSnap.exists()) avatarUrl = photoSnap.val();
+  } catch (e) {}
+
   const roomData = {
     code,
     hostId: hostUser.uid,
@@ -81,6 +87,7 @@ export const createRoom = async (hostUser, settings) => {
         score: 0,
         joinedAt: Date.now(),
         isOnline: true,
+        avatar: avatarUrl,
       },
     },
     round: 0,
@@ -91,8 +98,8 @@ export const createRoom = async (hostUser, settings) => {
   return code;
 };
 
-// Gabung room sebagai guest
-export const joinRoom = async (roomCode, playerName) => {
+// Gabung room sebagai guest / auth user
+export const joinRoom = async (roomCode, playerName, authUid = null) => {
   const code = roomCode.toUpperCase();
   const roomRef = ref(db, `rooms/${code}`);
   const snapshot = await get(roomRef);
@@ -104,19 +111,33 @@ export const joinRoom = async (roomCode, playerName) => {
   const playerCount = Object.keys(room.players || {}).length;
   if (playerCount >= room.settings.maxPlayers) throw new Error('Room penuh!');
 
-  // Buat guest ID unik
-  const guestId = 'guest_' + Math.random().toString(36).substr(2, 9);
+  const playerId = authUid || 'guest_' + Math.random().toString(36).substr(2, 9);
 
-  await update(ref(db, `rooms/${code}/players/${guestId}`), {
-    uid: guestId,
+  let avatarUrl = '';
+  try {
+    if (authUid) {
+      const photoSnap = await get(ref(db, `users/${authUid}/photoData`));
+      if (photoSnap.exists()) {
+        avatarUrl = photoSnap.val();
+      }
+    }
+  } catch (err) {}
+
+  if (!avatarUrl) {
+    avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(playerName)}`;
+  }
+
+  await update(ref(db, `rooms/${code}/players/${playerId}`), {
+    uid: playerId,
     name: playerName,
     isHost: false,
     score: 0,
     joinedAt: Date.now(),
     isOnline: true,
+    avatar: avatarUrl,
   });
 
-  return { code, guestId };
+  return { code, guestId: playerId };
 };
 
 // Mulai game

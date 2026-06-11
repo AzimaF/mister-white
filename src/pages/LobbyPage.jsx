@@ -168,8 +168,12 @@ export default function LobbyPage() {
                 {players.map((p, i) => (
                   <div key={p.uid} className={`player-item ${p.uid === myId ? 'me' : ''}`}
                     style={{ animationDelay: `${i * 0.05}s` }}>
-                    <div className="player-avatar">
-                      {getEmoji(i)}
+                    <div className="player-avatar" style={{ overflow: 'hidden', padding: 0 }}>
+                      {p.avatar ? (
+                        <img src={p.avatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        getEmoji(i)
+                      )}
                     </div>
                     <div className="player-info">
                       <div className="player-name">
