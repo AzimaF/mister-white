@@ -44,6 +44,10 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
+      if (!form.email.trim().toLowerCase().endsWith('@gmail.com')) {
+        throw new Error('Gunakan email dengan akhiran @gmail.com!');
+      }
+
       if (mode === 'register') {
         if (form.password !== form.confirmPassword) {
           throw new Error('Password tidak cocok!');
