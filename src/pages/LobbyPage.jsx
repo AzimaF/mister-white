@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { listenToRoom, startGame, deleteRoom, setPlayerOnline } from '../firebase/game';
+import { listenToRoom, startGame, deleteRoom, setPlayerOnline, setPlayerReady } from '../firebase/game';
 import './LobbyPage.css';
 
 export default function LobbyPage() {
@@ -60,10 +60,18 @@ export default function LobbyPage() {
     setStarting(true);
     setError('');
     try {
-      await startGame(code, user.uid);
+      await startGame(code, myId);
     } catch (err) {
       setError(err.message);
       setStarting(false);
+    }
+  };
+
+  const handleToggleReady = async () => {
+    if (isHost) return; // Host tak perlu klik siap
+    const myPlayer = room?.players?.[myId];
+    if (myPlayer) {
+      await setPlayerReady(code, myId, !myPlayer.isReady);
     }
   };
 
@@ -171,45 +179,71 @@ export default function LobbyPage() {
                       </div>
                       <div className="player-score">🏆 {p.score || 0} poin</div>
                     </div>
-                    <div className={`player-online ${p.isOnline ? 'online' : 'offline'}`} />
+                    <div className="player-status-wrap">
+                      {!p.isHost && (
+                        <div className={`ready-badge ${p.isReady ? 'ready' : 'not-ready'}`}>
+                          {p.isReady ? '✅ Siap' : '⏳ Wait'}
+                        </div>
+                      )}
+                      <div className={`player-online ${p.isOnline ? 'online' : 'offline'}`} />
+                    </div>
                   </div>
                 ))}
               </div>
 
-              {isHost && (
-                <div className="host-controls">
-                  {error && <div className="alert alert-error">{error}</div>}
-                  <button
-                    id="btn-start-game"
-                    className="host-start-btn"
-                    onClick={handleStartGame}
-                    disabled={starting || players.length < 2}
-                  >
-                    {starting ? (
-                      <>
-                        <div className="spinner" style={{ width: 20, height: 20, borderWidth: 2 }} />
-                        Memulai...
-                      </>
-                    ) : players.length < 2 ? (
-                      '⏳ Menunggu pemain lain...'
-                    ) : (
-                      '🚀 Mulai Game!'
-                    )}
-                  </button>
-                  <p className="host-tip">
-                    💡 Game akan mulai saat kamu klik tombol di atas.
-                  </p>
-                </div>
-              )}
-
-              {!isHost && (
-                <div className="waiting-message">
-                  <div className="waiting-dots">
-                    <span /><span /><span />
+              {isHost && (() => {
+                const allReady = players.every(p => p.isHost || p.isReady);
+                const readyCount = players.filter(p => !p.isHost && p.isReady).length;
+                const guestCount = players.length - 1;
+                return (
+                  <div className="host-controls">
+                    {error && <div className="alert alert-error">{error}</div>}
+                    <button
+                      id="btn-start-game"
+                      className="host-start-btn"
+                      onClick={handleStartGame}
+                      disabled={starting || players.length < 2 || !allReady}
+                    >
+                      {starting ? (
+                        <>
+                          <div className="spinner" style={{ width: 20, height: 20, borderWidth: 2 }} />
+                          Memulai...
+                        </>
+                      ) : players.length < 2 ? (
+                        '⏳ Menunggu pemain lain...'
+                      ) : !allReady ? (
+                        `⏳ Menunggu Pemain Siap (${readyCount}/${guestCount})`
+                      ) : (
+                        '🚀 Mulai Game!'
+                      )}
+                    </button>
+                    <p className="host-tip">
+                      💡 Game hanya bisa dimulai jika semua pemain sudah mengeklik "Siap".
+                    </p>
                   </div>
-                  <p>Menunggu host memulai game...</p>
-                </div>
-              )}
+                );
+              })()}
+
+              {!isHost && (() => {
+                const myPlayer = room?.players?.[myId];
+                const isReady = myPlayer?.isReady;
+                return (
+                  <div className="guest-controls">
+                    <button 
+                      className={`btn-ready-toggle ${isReady ? 'is-ready' : ''}`}
+                      onClick={handleToggleReady}
+                    >
+                      {isReady ? '❌ Batal Siap' : '✅ Saya Siap!'}
+                    </button>
+                    <div className="waiting-message" style={{ marginTop: '12px' }}>
+                      <div className="waiting-dots">
+                        <span /><span /><span />
+                      </div>
+                      <p>Menunggu host memulai game...</p>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>

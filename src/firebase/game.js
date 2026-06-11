@@ -308,3 +308,8 @@ export const deleteRoom = async (roomCode) => {
 export const setPlayerOnline = async (roomCode, playerId, isOnline) => {
   await update(ref(db, `rooms/${roomCode}/players/${playerId}`), { isOnline });
 };
+
+// Update status siap pemain
+export const setPlayerReady = async (roomCode, playerId, isReady) => {
+  await update(ref(db, `rooms/${roomCode}/players/${playerId}`), { isReady });
+};

@@ -332,6 +332,70 @@
 .waiting-dots span:nth-child(2) { animation-delay: 0.15s; }
 .waiting-dots span:nth-child(3) { animation-delay: 0.3s; }
 
+.player-status-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ready-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ready-badge.ready {
+  background: rgba(46, 213, 115, 0.15);
+  color: var(--clr-green);
+}
+
+.ready-badge.not-ready {
+  background: rgba(255, 165, 2, 0.15);
+  color: #e69500;
+}
+
+.guest-controls {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 2px dashed var(--clr-border);
+  text-align: center;
+}
+
+.btn-ready-toggle {
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 800;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: var(--transition-base);
+  background: var(--clr-bg);
+  color: white;
+}
+
+.btn-ready-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-btn);
+  background: var(--clr-bg-dark);
+}
+
+.btn-ready-toggle.is-ready {
+  background: var(--clr-surface);
+  color: var(--clr-text);
+  border: 2px solid var(--clr-border);
+}
+
+.btn-ready-toggle.is-ready:hover {
+  background: #ffeaa7;
+  border-color: #fdcb6e;
+  color: #d63031;
+}
+
 @media (max-width: 900px) {
   .lobby-grid { grid-template-columns: 1fr; }
 }
