@@ -9,7 +9,7 @@ import './ProfilePage.css';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -114,6 +114,15 @@ export default function ProfilePage() {
     setLoading(false);
   };
 
+  const handleLogout = async () => {
+    try {
+      if (logout) await logout();
+      navigate('/');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   if (!user) return null;
 
   const defaultAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user.displayName || user.email)}`;
@@ -193,6 +202,16 @@ export default function ProfilePage() {
               {loading ? 'Menyimpan...' : '🔑 Ubah Password'}
             </button>
           </form>
+        </div>
+
+        <div className="profile-section" style={{ borderBottom: 'none', paddingBottom: 0, marginTop: '24px' }}>
+          <button 
+            className="btn btn-outline-white" 
+            onClick={handleLogout}
+            style={{ width: '100%', borderColor: '#EF4444', color: '#EF4444' }}
+          >
+            🚪 Keluar dari Akun
+          </button>
         </div>
       </div>
     </div>
