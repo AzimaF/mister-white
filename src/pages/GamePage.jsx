@@ -38,6 +38,19 @@ export default function GamePage() {
   const guestId = sessionStorage.getItem('guestId');
   const myId = user?.uid || guestId;
 
+  // Derived state that needs to be accessed by effects
+  const players = Object.values(room?.players || {});
+  const myAssignment = room?.assignments?.[myId];
+  const myRole = myAssignment?.role;
+  const myWord = myAssignment?.word;
+  const isHost = room?.hostId === myId;
+  const isRandomMode = room?.settings?.wordMode === 'random';
+  const turnOrder = room?.turnOrder || [];
+  const currentTurnId = turnOrder[room?.currentTurnIndex || 0];
+  const isMyTurn = currentTurnId === myId;
+  const clues = room?.clues || {};
+  const votes = room?.votes || {};
+
   useEffect(() => {
     const unsubscribe = listenToRoom(code, (data) => {
       if (!data) { navigate('/'); return; }
@@ -158,18 +171,6 @@ export default function GamePage() {
       </div>
     );
   }
-
-  const players = Object.values(room.players || {});
-  const myAssignment = room.assignments?.[myId];
-  const myRole = myAssignment?.role;
-  const myWord = myAssignment?.word;
-  const isHost = room.hostId === myId;
-  const isRandomMode = room.settings?.wordMode === 'random';
-  const turnOrder = room.turnOrder || [];
-  const currentTurnId = turnOrder[room.currentTurnIndex || 0];
-  const isMyTurn = currentTurnId === myId;
-  const clues = room.clues || {};
-  const votes = room.votes || {};
 
   // ---- RENDER: Word Reveal Screen ----
   if (room.status === 'playing' && !showWord) {
