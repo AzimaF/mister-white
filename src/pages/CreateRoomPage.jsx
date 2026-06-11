@@ -27,7 +27,21 @@ export default function CreateRoomPage() {
   }, [user]);
 
   const handleChange = (key, value) => {
-    setSettings((prev) => ({ ...prev, [key]: value }));
+    setSettings((prev) => {
+      const nextSettings = { ...prev, [key]: value };
+      
+      if (key === 'maxPlayers') {
+        let maxAllowed = 1;
+        if (value >= 6) maxAllowed = 2;
+        if (value >= 10) maxAllowed = 3;
+        
+        if (nextSettings.mrWhiteCount > maxAllowed) {
+          nextSettings.mrWhiteCount = maxAllowed;
+        }
+      }
+      
+      return nextSettings;
+    });
   };
 
   const handleCreate = async (e) => {
@@ -100,7 +114,11 @@ export default function CreateRoomPage() {
                   value={settings.mrWhiteCount}
                   onChange={(e) => handleChange('mrWhiteCount', Number(e.target.value))}
                 >
-                  {[1,2,3].map(n => (
+                  {[1,2,3].filter(n => {
+                    if (settings.maxPlayers < 6) return n <= 1;
+                    if (settings.maxPlayers < 10) return n <= 2;
+                    return true;
+                  }).map(n => (
                     <option key={n} value={n}>{n} Mr. White</option>
                   ))}
                 </select>

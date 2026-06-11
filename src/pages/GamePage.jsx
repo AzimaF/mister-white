@@ -148,6 +148,7 @@ export default function GamePage() {
   const myRole = myAssignment?.role;
   const myWord = myAssignment?.word;
   const isHost = room.hostId === myId;
+  const isRandomMode = room.settings?.wordMode === 'random';
   const turnOrder = room.turnOrder || [];
   const currentTurnId = turnOrder[room.currentTurnIndex || 0];
   const isMyTurn = currentTurnId === myId;
@@ -162,29 +163,51 @@ export default function GamePage() {
         <div className="word-reveal-screen">
           <div className="word-reveal-card">
             <div className="word-reveal-round">Ronde {room.round}</div>
-            <div className="word-reveal-title">Peranmu adalah...</div>
-            <div className={`role-badge-big ${myRole}`}>
-              {myRole === 'civilian' ? '👤 Civilian' : '🕵️ Mr. White'}
-            </div>
-            {myRole === 'civilian' && (
+            
+            {!isRandomMode && (
+              <>
+                <div className="word-reveal-title">Peranmu adalah...</div>
+                <div className={`role-badge-big ${myRole}`}>
+                  {myRole === 'civilian' ? '👤 Civilian' : '🕵️ Mr. White'}
+                </div>
+              </>
+            )}
+
+            {isRandomMode && (
+              <div className="word-reveal-title" style={{ marginTop: '20px', marginBottom: '20px', fontSize: '1.2rem', fontWeight: 'bold' }}>
+                Mode Diacak (Sulit) 🎲
+              </div>
+            )}
+
+            {(!isRandomMode && myRole === 'civilian') && (
               <div className="word-reveal-word-section">
                 <div className="word-reveal-label">Katamu:</div>
                 <div className="word-reveal-word">{myWord}</div>
               </div>
             )}
-            {myRole === 'mrwhite' && myWord && (
+            
+            {(!isRandomMode && myRole === 'mrwhite' && myWord) && (
               <div className="word-reveal-word-section">
                 <div className="word-reveal-label">Katamu (Mungkin berbeda!):</div>
                 <div className="word-reveal-word mrwhite-word">{myWord}</div>
               </div>
             )}
-            {myRole === 'mrwhite' && !myWord && (
+            
+            {(!isRandomMode && myRole === 'mrwhite' && !myWord) && (
               <div className="word-reveal-word-section">
                 <div className="word-reveal-label" style={{ color: 'var(--clr-mrwhite-light)' }}>
                   Kamu tidak mendapat kata! Tebak dari petunjuk orang lain.
                 </div>
               </div>
             )}
+
+            {(isRandomMode) && (
+              <div className="word-reveal-word-section">
+                <div className="word-reveal-label">Kata Rahasiamu:</div>
+                <div className="word-reveal-word">{myWord}</div>
+              </div>
+            )}
+
             <p className="word-reveal-hint">
               ⚠️ Jangan perlihatkan layarmu ke orang lain!
             </p>
@@ -464,9 +487,16 @@ export default function GamePage() {
         <div className="game-header">
           <div className="game-round-badge">Ronde {room.round}</div>
           <div className="game-title">🎮 Mister White</div>
-          <div className={`my-role-badge ${myRole}`}>
-            {myRole === 'civilian' ? '👤 Civilian' : '🕵️ Mr. White'}
-          </div>
+          {!isRandomMode && (
+            <div className={`my-role-badge ${myRole}`}>
+              {myRole === 'civilian' ? '👤 Civilian' : '🕵️ Mr. White'}
+            </div>
+          )}
+          {isRandomMode && (
+            <div className={`my-role-badge`} style={{ background: 'var(--clr-surface)', color: 'var(--clr-text)' }}>
+              🎲 Diacak
+            </div>
+          )}
         </div>
 
         <div className="game-grid">
@@ -489,9 +519,16 @@ export default function GamePage() {
                   ? '••••••••' 
                   : (myWord || (myRole === 'mrwhite' ? '❓ Tebak dari petunjuk!' : '—'))}
               </div>
-              <div className={`my-word-role ${myRole}`}>
-                {myRole === 'civilian' ? '✅ Kamu adalah Civilian' : '🕵️ Kamu adalah Mr. White'}
-              </div>
+              {!isRandomMode && (
+                <div className={`my-word-role ${myRole}`}>
+                  {myRole === 'civilian' ? '✅ Kamu adalah Civilian' : '🕵️ Kamu adalah Mr. White'}
+                </div>
+              )}
+              {isRandomMode && (
+                <div className={`my-word-role`} style={{ background: 'var(--clr-bg-dark)', color: 'var(--clr-text-muted)' }}>
+                  🤫 Siapakah dirimu sebenarnya?
+                </div>
+              )}
             </div>
 
             {/* Timer */}
