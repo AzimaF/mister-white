@@ -78,13 +78,13 @@ export default function ProfilePage() {
       if (photoData) {
         // Save to RTDB for easy access in game
         await set(ref(db, `users/${user.uid}/photoData`), photoData);
-        await updateProfile(user, { photoURL: photoData });
+        // Do NOT use updateProfile for photoData because base64 strings exceed Firebase Auth photoURL length limits.
       }
 
       setSuccess('Profil berhasil diperbarui!');
     } catch (err) {
-      console.error(err);
-      setError('Gagal memperbarui profil.');
+      console.error("Error update profile:", err);
+      setError(err.message || 'Gagal memperbarui profil.');
     }
     setLoading(false);
   };
