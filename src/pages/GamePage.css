@@ -922,7 +922,28 @@
 .mic-btn.listening {
   background: #FEE2E2;
   border-color: #EF4444;
-  animation: mic-pulse 1.5s infinite;
+  animation: pulse 2s infinite;
+}
+
+.btn-force-end {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--clr-red);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--radius-base);
+  font-weight: bold;
+  font-size: 0.85rem;
+  cursor: pointer;
+  z-index: 100;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  transition: all 0.2s;
+}
+.btn-force-end:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(255, 71, 87, 0.4);
 }
 
 @keyframes mic-pulse {

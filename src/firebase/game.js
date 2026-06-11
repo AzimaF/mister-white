@@ -156,23 +156,27 @@ export const startGame = async (roomCode, hostId) => {
 
 // Submit clue dari pemain
 export const submitClue = async (roomCode, playerId, clue) => {
-  await set(ref(db, `rooms/${roomCode}/clues/${playerId}`), {
-    clue,
+  const roomRef = ref(db, `rooms/${roomCode}/clues/${playerId}`);
+  const snap = await get(roomRef);
+  const existing = snap.val();
+  const newClueText = existing ? `${existing.clue} • ${clue}` : clue;
+
+  await set(roomRef, {
+    clue: newClueText,
     submittedAt: Date.now(),
   });
 };
 
-// Advance ke giliran berikutnya atau mulai voting
-export const nextTurn = async (roomCode, hostId) => {
+// Advance ke giliran berikutnya atau mulai diskusi
+export const nextTurn = async (roomCode) => {
   const snapshot = await get(ref(db, `rooms/${roomCode}`));
   const room = snapshot.val();
-  if (room.hostId !== hostId) throw new Error('Hanya host yang bisa lanjut!');
 
   const nextIndex = (room.currentTurnIndex || 0) + 1;
   if (nextIndex >= room.turnOrder.length) {
-    // Semua sudah clue, mulai voting
+    // Semua sudah clue, masuk sesi diskusi
     await update(ref(db, `rooms/${roomCode}`), {
-      status: 'voting',
+      status: 'discuss',
       currentTurnIndex: nextIndex,
       timerStart: Date.now(),
     });
@@ -182,6 +186,32 @@ export const nextTurn = async (roomCode, hostId) => {
       timerStart: Date.now(),
     });
   }
+};
+
+// Mulai putaran petunjuk tambahan
+export const startExtraClueRound = async (roomCode, hostId) => {
+  const snapshot = await get(ref(db, `rooms/${roomCode}`));
+  const room = snapshot.val();
+  if (room.hostId !== hostId) throw new Error('Hanya host yang bisa lanjut!');
+
+  await update(ref(db, `rooms/${roomCode}`), {
+    status: 'playing',
+    currentTurnIndex: 0,
+    clueRound: (room.clueRound || 1) + 1,
+    timerStart: Date.now(),
+  });
+};
+
+// Lanjut ke fase voting dari diskusi
+export const startVoting = async (roomCode, hostId) => {
+  const snapshot = await get(ref(db, `rooms/${roomCode}`));
+  const room = snapshot.val();
+  if (room.hostId !== hostId) throw new Error('Hanya host yang bisa mulai voting!');
+
+  await update(ref(db, `rooms/${roomCode}`), {
+    status: 'voting',
+    timerStart: Date.now(),
+  });
 };
 
 // Submit vote
@@ -249,6 +279,36 @@ export const processVotes = async (roomCode, hostId) => {
     [`rooms/${roomCode}/winner`]: hasWinner
       ? Object.keys(updatedScores).sort((a, b) => updatedScores[b] - updatedScores[a])[0]
       : null,
+  });
+};
+
+// Akhiri game paksa oleh host
+export const forceEndGame = async (roomCode, hostId) => {
+  const snapshot = await get(ref(db, `rooms/${roomCode}`));
+  const room = snapshot.val();
+  if (room.hostId !== hostId) throw new Error('Hanya host yang bisa mengakhiri game!');
+
+  const updatedScores = {};
+  Object.keys(room.players).forEach((pid) => {
+    updatedScores[pid] = room.players[pid].score || 0;
+  });
+
+  const maxScore = Math.max(...Object.values(updatedScores));
+  let winnerId = null;
+  
+  if (Object.keys(updatedScores).length > 0 && maxScore > 0) {
+    winnerId = Object.keys(updatedScores).sort((a, b) => updatedScores[b] - updatedScores[a])[0];
+  } else if (Object.keys(updatedScores).length > 0) {
+    // Jika semua skor 0, pemenangnya acak atau host
+    winnerId = hostId;
+  }
+
+  await update(ref(db, `rooms/${roomCode}`), {
+    status: 'finished',
+    winner: winnerId,
+    kickedPlayerId: null,
+    kickedRole: null,
+    roundResult: null,
   });
 };
 

@@ -10,6 +10,9 @@ import {
   processVotes,
   nextRound,
   setPlayerOnline,
+  startExtraClueRound,
+  startVoting,
+  forceEndGame,
 } from '../firebase/game';
 import './GamePage.css';
 
@@ -39,9 +42,7 @@ export default function GamePage() {
       setRoom(data);
       setLoading(false);
 
-      // Reset submitted when round changes
-      setSubmitted(false);
-      setClue('');
+      // Reset submitted when round or clueRound changes
       setMyVote(null);
       setShowWord(false);
       setIsWordHidden(true);
@@ -56,6 +57,22 @@ export default function GamePage() {
       if (myId) setPlayerOnline(code, myId, false);
     };
   }, [code]);
+
+  // Reset clue input when clueRound changes
+  const [currentClueRound, setCurrentClueRound] = useState(1);
+  useEffect(() => {
+    if (room && room.clueRound !== currentClueRound) {
+      setSubmitted(false);
+      setClue('');
+      setCurrentClueRound(room.clueRound || 1);
+    }
+    if (room && room.round !== currentClueRound && room.status === 'playing') {
+      // Also reset on completely new round
+      setSubmitted(false);
+      setClue('');
+      setCurrentClueRound(1);
+    }
+  }, [room?.clueRound, room?.round, room?.status]);
 
   // Timer logic
   useEffect(() => {
@@ -179,6 +196,61 @@ export default function GamePage() {
               ✅ Saya Sudah Menghafal!
             </button>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ---- RENDER: Discuss Phase ----
+  if (room.status === 'discuss') {
+    return (
+      <div className="game-page">
+        <div className="game-deco-1" />
+        <div className="voting-screen">
+          <div className="voting-header">
+            <div className="voting-title">💬 Sesi Diskusi</div>
+            <div className="voting-subtitle">Semua pemain telah memberikan petunjuk!</div>
+          </div>
+
+          <div className="clues-recap">
+            <div className="clues-recap-title">📝 Rekap Petunjuk</div>
+            <div className="clues-list">
+              {players.map((p) => (
+                clues[p.uid] && (
+                  <div key={p.uid} className="clue-recap-item">
+                    <span className="clue-player-name">{p.name}:</span>
+                    <span className="clue-text">"{clues[p.uid].clue}"</span>
+                  </div>
+                )
+              ))}
+            </div>
+          </div>
+
+          {isHost ? (
+            <div className="discuss-host-actions" style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+              <button
+                className="btn btn-outline-white"
+                style={{ flex: 1 }}
+                onClick={() => startExtraClueRound(code, myId)}
+              >
+                🔁 Minta Petunjuk Tambahan
+              </button>
+              <button
+                className="btn btn-blue"
+                style={{ flex: 1 }}
+                onClick={() => startVoting(code, myId)}
+              >
+                🗳️ Mulai Voting Sekarang!
+              </button>
+            </div>
+          ) : (
+            <div className="waiting-message" style={{ marginTop: 24 }}>
+              <div className="waiting-dots">
+                <span /><span /><span />
+              </div>
+              <p>Menunggu Host memutuskan...</p>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -374,6 +446,19 @@ export default function GamePage() {
     <div className="game-page">
       <div className="game-deco-1" />
 
+      {isHost && (
+        <button 
+          className="btn-force-end"
+          onClick={() => {
+            if (window.confirm("Yakin ingin mengakhiri game sekarang? Pemain dengan poin tertinggi akan menang.")) {
+              forceEndGame(code, myId);
+            }
+          }}
+        >
+          🛑 Akhiri Game
+        </button>
+      )}
+
       <div className="game-container">
         {/* Header */}
         <div className="game-header">
@@ -469,6 +554,7 @@ export default function GamePage() {
                   onClick={async () => {
                     await submitClue(code, myId, clue.trim());
                     setSubmitted(true);
+                    await nextTurn(code);
                   }}
                 >
                   ✅ Kirim Petunjuk
@@ -488,17 +574,6 @@ export default function GamePage() {
                   Menunggu giliran <strong>{room.players?.[currentTurnId]?.name || '...'}</strong>
                 </div>
               </div>
-            )}
-
-            {/* Host next turn button */}
-            {isHost && (
-              <button
-                id="btn-next-turn"
-                className="host-next-btn"
-                onClick={() => nextTurn(code, myId)}
-              >
-                ⏩ Lanjut Giliran Berikutnya
-              </button>
             )}
           </div>
 
