@@ -8,6 +8,7 @@ import JoinRoomPage from './pages/JoinRoomPage';
 import LobbyPage from './pages/LobbyPage';
 import GamePage from './pages/GamePage';
 import ProfilePage from './pages/ProfilePage';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import './index.css';
 
 function App() {
@@ -20,7 +21,7 @@ function App() {
           <Route path="/create-room" element={<CreateRoomPage />} />
           <Route path="/join" element={<JoinRoomPage />} />
           <Route path="/room/:code" element={<LobbyPage />} />
-          <Route path="/room/:code/play" element={<GamePage />} />
+          <Route path="/room/:code/play" element={<ErrorBoundary><GamePage /></ErrorBoundary>} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
