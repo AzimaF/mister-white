@@ -78,23 +78,14 @@
 
 /* ---- My Word Card ---- */
 .my-word-card {
+  background: var(--clr-white);
   border-radius: var(--radius-xl);
   padding: var(--space-xl);
   text-align: center;
   margin-bottom: var(--space-md);
   animation: pop-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
-}
-
-.my-word-card.civilian {
-  background: var(--clr-white);
-  border: 3px solid var(--clr-green);
-  box-shadow: 0 4px 24px rgba(93,200,95,0.2);
-}
-
-.my-word-card.mrwhite {
-  background: var(--clr-white);
-  border: 3px solid #EF4444;
-  box-shadow: 0 4px 24px rgba(239,68,68,0.2);
+  border: 3px solid var(--clr-border);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.05);
 }
 
 .my-word-label {

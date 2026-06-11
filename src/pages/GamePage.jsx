@@ -166,47 +166,20 @@ export default function GamePage() {
           <div className="word-reveal-card">
             <div className="word-reveal-round">Ronde {room.round}</div>
             
-            {!isRandomMode && (
-              <>
-                <div className="word-reveal-title">Peranmu adalah...</div>
-                <div className={`role-badge-big ${myRole}`}>
-                  {myRole === 'civilian' ? '👤 Civilian' : '🕵️ Mr. White'}
-                </div>
-              </>
-            )}
+            <div className="word-reveal-title" style={{ marginTop: '20px', marginBottom: '20px', fontSize: '1.2rem', fontWeight: 'bold' }}>
+              Kata Rahasiamu 🤫
+            </div>
 
-            {isRandomMode && (
-              <div className="word-reveal-title" style={{ marginTop: '20px', marginBottom: '20px', fontSize: '1.2rem', fontWeight: 'bold' }}>
-                Mode Diacak (Sulit) 🎲
-              </div>
-            )}
-
-            {(!isRandomMode && myRole === 'civilian') && (
+            {myWord ? (
               <div className="word-reveal-word-section">
-                <div className="word-reveal-label">Katamu:</div>
+                <div className="word-reveal-label">Hafalkan katamu:</div>
                 <div className="word-reveal-word">{myWord}</div>
               </div>
-            )}
-            
-            {(!isRandomMode && myRole === 'mrwhite' && myWord) && (
-              <div className="word-reveal-word-section">
-                <div className="word-reveal-label">Katamu (Mungkin berbeda!):</div>
-                <div className="word-reveal-word mrwhite-word">{myWord}</div>
-              </div>
-            )}
-            
-            {(!isRandomMode && myRole === 'mrwhite' && !myWord) && (
+            ) : (
               <div className="word-reveal-word-section">
                 <div className="word-reveal-label" style={{ color: 'var(--clr-mrwhite-light)' }}>
                   Kamu tidak mendapat kata! Tebak dari petunjuk orang lain.
                 </div>
-              </div>
-            )}
-
-            {(isRandomMode) && (
-              <div className="word-reveal-word-section">
-                <div className="word-reveal-label">Kata Rahasiamu:</div>
-                <div className="word-reveal-word">{myWord}</div>
               </div>
             )}
 
@@ -513,23 +486,13 @@ export default function GamePage() {
             )}
           </div>
           <div className="game-title">🎮 Mister White</div>
-          {!isRandomMode && (
-            <div className={`my-role-badge ${myRole}`}>
-              {myRole === 'civilian' ? '👤 Civilian' : '🕵️ Mr. White'}
-            </div>
-          )}
-          {isRandomMode && (
-            <div className={`my-role-badge`} style={{ background: 'var(--clr-surface)', color: 'var(--clr-text)' }}>
-              🎲 Diacak
-            </div>
-          )}
         </div>
 
         <div className="game-grid">
           {/* Left: My Word + Turn */}
           <div className="game-left">
             {/* My Word Card */}
-            <div className={`my-word-card ${myRole}`}>
+            <div className="my-word-card">
               <div className="my-word-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                 Katamu
                 <button 
@@ -543,18 +506,8 @@ export default function GamePage() {
               <div className="my-word-text" style={{ transition: 'all 0.3s' }}>
                 {isWordHidden 
                   ? '••••••••' 
-                  : (myWord || (myRole === 'mrwhite' ? '❓ Tebak dari petunjuk!' : '—'))}
+                  : (myWord || '❓ Tebak dari petunjuk!')}
               </div>
-              {!isRandomMode && (
-                <div className={`my-word-role ${myRole}`}>
-                  {myRole === 'civilian' ? '✅ Kamu adalah Civilian' : '🕵️ Kamu adalah Mr. White'}
-                </div>
-              )}
-              {isRandomMode && (
-                <div className={`my-word-role`} style={{ background: 'var(--clr-bg-dark)', color: 'var(--clr-text-muted)' }}>
-                  🤫 Siapakah dirimu sebenarnya?
-                </div>
-              )}
             </div>
 
             {/* Timer */}
