@@ -49,7 +49,8 @@ export default function GamePage() {
   const isRandomMode = room?.settings?.wordMode === 'random';
   const turnOrder = room?.turnOrder || [];
   const currentTurnId = turnOrder[room?.currentTurnIndex || 0];
-  const isMyTurn = currentTurnId === myId;
+  const isMeEliminated = room?.players?.[myId]?.isEliminated;
+  const isMyTurn = currentTurnId === myId && !isMeEliminated;
   const clues = room?.clues || {};
   const votes = room?.votes || {};
 
@@ -270,6 +271,11 @@ export default function GamePage() {
                 🗳️ Mulai Voting Sekarang!
               </button>
             </div>
+          ) : isMeEliminated ? (
+            <div className="waiting-message" style={{ marginTop: 24, background: '#fef2f2', borderColor: '#fca5a5', color: '#991b1b', border: '1px solid', padding: '16px', borderRadius: '12px' }}>
+              <div style={{ fontSize: '1.5rem', marginBottom: '8px' }}>💀</div>
+              <p>Kamu sudah tereliminasi, tidak bisa ikut diskusi!</p>
+            </div>
           ) : (
             <div className="waiting-message" style={{ marginTop: 24 }}>
               <div className="waiting-dots">
@@ -297,7 +303,8 @@ export default function GamePage() {
   // ---- RENDER: Voting ----
   if (room.status === 'voting') {
     const hasVoted = !!votes[myId];
-    const totalVoters = players.length;
+    const alivePlayers = players.filter(p => !p.isEliminated);
+    const totalVoters = alivePlayers.length;
     const votesCast = Object.keys(votes).length;
 
     return (
@@ -324,11 +331,11 @@ export default function GamePage() {
             </div>
           </div>
 
-          {!hasVoted ? (
+          {!isMeEliminated && !hasVoted ? (
             <div className="vote-options">
               <div className="vote-options-title">Pilih siapa Mr. White:</div>
               <div className="vote-grid">
-                {players.filter(p => p.uid !== myId).map((p) => (
+                {players.filter(p => p.uid !== myId && !p.isEliminated).map((p) => (
                   <button
                     key={p.uid}
                     id={`vote-${p.uid}`}
@@ -355,6 +362,12 @@ export default function GamePage() {
               >
                 🗳️ Kirim Vote!
               </button>
+            </div>
+          ) : isMeEliminated ? (
+            <div className="vote-submitted" style={{ background: '#fef2f2', borderColor: '#fca5a5', color: '#991b1b' }}>
+              <div className="vote-submitted-icon">💀</div>
+              <div className="vote-submitted-text">Kamu sudah mati, tidak bisa voting!</div>
+              <div className="vote-submitted-sub">Menonton pemain lain voting...</div>
             </div>
           ) : (
             <div className="vote-submitted">
@@ -722,10 +735,18 @@ export default function GamePage() {
               </div>
             )}
 
-            {!isMyTurn && (
+            {!isMyTurn && !isMeEliminated && (
               <div className="waiting-turn">
                 <div className="waiting-turn-text">
                   Menunggu giliran <strong>{room.players?.[currentTurnId]?.name || '...'}</strong>
+                </div>
+              </div>
+            )}
+
+            {isMeEliminated && (
+              <div className="waiting-turn" style={{ background: '#fef2f2', borderColor: '#fca5a5' }}>
+                <div className="waiting-turn-text" style={{ color: '#991b1b' }}>
+                  💀 <strong>Kamu telah tereliminasi!</strong><br /> Menonton sisa permainan...
                 </div>
               </div>
             )}
@@ -745,12 +766,14 @@ export default function GamePage() {
                   return (
                     <div key={pid} className={`turn-item ${isCurrent ? 'current' : ''} ${isDone ? 'done' : ''}`}>
                       <div className="turn-number">{i + 1}</div>
-                      {p?.avatar ? (
+                      {p?.isEliminated ? (
+                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', flexShrink: 0 }}>💀</div>
+                      ) : p?.avatar ? (
                         <img src={p.avatar} alt="avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                       ) : (
                         <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--clr-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>👤</div>
                       )}
-                      <div className="turn-player-name" style={{ marginLeft: 8 }}>
+                      <div className="turn-player-name" style={{ marginLeft: 8, textDecoration: p?.isEliminated ? 'line-through' : 'none', opacity: p?.isEliminated ? 0.5 : 1 }}>
                         {p?.name}
                         {pid === myId && <span style={{ opacity: 0.6, fontSize: '0.75rem' }}> (Saya)</span>}
                       </div>
