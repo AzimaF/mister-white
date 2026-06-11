@@ -13,17 +13,23 @@ export default function JoinRoomPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Avatar selector for guests
-  const avatarThemes = ['bottts', 'adventurer', 'avataaars', 'fun-emoji', 'lorelei', 'micah'];
-  const [avatarTheme, setAvatarTheme] = useState('bottts');
-  const [avatarSeed, setAvatarSeed] = useState(Math.random().toString(36).substring(7));
+  const PRESET_AVATARS = [
+    'https://api.dicebear.com/7.x/bottts/svg?seed=Felix',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Mimi',
+    'https://api.dicebear.com/7.x/fun-emoji/svg?seed=Lucky',
+    'https://api.dicebear.com/7.x/lorelei/svg?seed=Bella',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Jack',
+    'https://api.dicebear.com/7.x/micah/svg?seed=Oliver',
+    'https://api.dicebear.com/7.x/bottts/svg?seed=Zoe',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Leo',
+    'https://api.dicebear.com/7.x/fun-emoji/svg?seed=Happy',
+    'https://api.dicebear.com/7.x/lorelei/svg?seed=Luna',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Sam',
+    'https://api.dicebear.com/7.x/micah/svg?seed=Mia'
+  ];
 
-  const handleRandomAvatar = () => {
-    const randomTheme = avatarThemes[Math.floor(Math.random() * avatarThemes.length)];
-    const randomSeed = Math.random().toString(36).substring(7);
-    setAvatarTheme(randomTheme);
-    setAvatarSeed(randomSeed);
-  };
+  const [selectedAvatar, setSelectedAvatar] = useState(PRESET_AVATARS[Math.floor(Math.random() * PRESET_AVATARS.length)]);
+  const [showPicker, setShowPicker] = useState(false);
 
   const handleJoin = async (e) => {
     e.preventDefault();
@@ -34,7 +40,7 @@ export default function JoinRoomPage() {
     setLoading(true);
     setError('');
     try {
-      const customAvatarUrl = !user ? `https://api.dicebear.com/7.x/${avatarTheme}/svg?seed=${avatarSeed}` : null;
+      const customAvatarUrl = !user ? selectedAvatar : null;
       const { code, guestId } = await joinRoom(roomCode.trim(), playerName.trim(), user?.uid, customAvatarUrl);
       if (!user) {
         sessionStorage.setItem('guestId', guestId);
@@ -105,18 +111,40 @@ export default function JoinRoomPage() {
             </div>
 
             {!user && (
-              <div className="join-avatar-section" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '20px' }}>
+              <div className="join-avatar-section" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '20px', position: 'relative' }}>
                 <label className="form-label">Avatar Kamu</label>
                 <div style={{ position: 'relative', width: 80, height: 80, borderRadius: '50%', backgroundColor: 'var(--clr-surface)', margin: '10px 0', border: '3px solid var(--clr-bg)' }}>
                   <img 
-                    src={`https://api.dicebear.com/7.x/${avatarTheme}/svg?seed=${avatarSeed}`} 
-                    alt="Guest Avatar Preview" 
+                    src={selectedAvatar} 
+                    alt="Guest Avatar" 
                     style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
                   />
                 </div>
-                <button type="button" className="btn btn-outline-white btn-sm" onClick={handleRandomAvatar} style={{ color: 'var(--clr-text-secondary)', borderColor: 'var(--clr-border)', background: 'white' }}>
-                  🎲 Acak Profil
+                <button type="button" className="btn btn-outline-white btn-sm" onClick={() => setShowPicker(!showPicker)} style={{ color: 'var(--clr-text-secondary)', borderColor: 'var(--clr-border)', background: 'white' }}>
+                  {showPicker ? 'Tutup Pilihan' : '🖼️ Pilih Avatar'}
                 </button>
+
+                {showPicker && (
+                  <div className="avatar-picker-grid" style={{ 
+                    position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', 
+                    background: 'var(--clr-card)', padding: '16px', borderRadius: 'var(--radius-lg)', 
+                    boxShadow: 'var(--shadow-card)', zIndex: 10, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginTop: '12px', width: '280px'
+                  }}>
+                    {PRESET_AVATARS.map((url, idx) => (
+                      <div 
+                        key={idx}
+                        onClick={() => { setSelectedAvatar(url); setShowPicker(false); }}
+                        style={{
+                          width: '48px', height: '48px', borderRadius: '50%', background: 'var(--clr-surface)', cursor: 'pointer',
+                          border: selectedAvatar === url ? '3px solid var(--clr-primary)' : '2px solid transparent',
+                          padding: '2px', transition: 'all 0.2s'
+                        }}
+                      >
+                        <img src={url} alt={`preset-${idx}`} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

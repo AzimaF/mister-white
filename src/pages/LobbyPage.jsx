@@ -14,6 +14,7 @@ export default function LobbyPage() {
   const [starting, setStarting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   const guestId = sessionStorage.getItem('guestId');
   const myId = user?.uid || guestId;
@@ -89,12 +90,24 @@ export default function LobbyPage() {
     }
   };
 
-  const handleRandomizeAvatar = async () => {
-    const avatarThemes = ['bottts', 'adventurer', 'avataaars', 'fun-emoji', 'lorelei', 'micah'];
-    const randomTheme = avatarThemes[Math.floor(Math.random() * avatarThemes.length)];
-    const randomSeed = Math.random().toString(36).substring(7);
-    const newAvatarUrl = `https://api.dicebear.com/7.x/${randomTheme}/svg?seed=${randomSeed}`;
-    await updatePlayerAvatar(code, myId, newAvatarUrl);
+  const PRESET_AVATARS = [
+    'https://api.dicebear.com/7.x/bottts/svg?seed=Felix',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Mimi',
+    'https://api.dicebear.com/7.x/fun-emoji/svg?seed=Lucky',
+    'https://api.dicebear.com/7.x/lorelei/svg?seed=Bella',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Jack',
+    'https://api.dicebear.com/7.x/micah/svg?seed=Oliver',
+    'https://api.dicebear.com/7.x/bottts/svg?seed=Zoe',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Leo',
+    'https://api.dicebear.com/7.x/fun-emoji/svg?seed=Happy',
+    'https://api.dicebear.com/7.x/lorelei/svg?seed=Luna',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Sam',
+    'https://api.dicebear.com/7.x/micah/svg?seed=Mia'
+  ];
+
+  const handleSelectAvatar = async (url) => {
+    await updatePlayerAvatar(code, myId, url);
+    setShowAvatarPicker(false);
   };
 
   if (loading) {
@@ -243,7 +256,7 @@ export default function LobbyPage() {
                 const myPlayer = room?.players?.[myId];
                 const isReady = myPlayer?.isReady;
                 return (
-                  <div className="guest-controls">
+                  <div className="guest-controls" style={{ position: 'relative' }}>
                     <div style={{ display: 'flex', gap: '12px' }}>
                       <button 
                         className={`btn-ready-toggle ${isReady ? 'is-ready' : ''}`}
@@ -257,12 +270,35 @@ export default function LobbyPage() {
                         <button 
                           className="btn btn-outline-white"
                           style={{ color: 'var(--clr-text-secondary)', borderColor: 'var(--clr-border)', background: 'white', flex: 1, fontWeight: 'bold' }}
-                          onClick={handleRandomizeAvatar}
+                          onClick={() => setShowAvatarPicker(!showAvatarPicker)}
                         >
-                          🎲 Acak Avatar
+                          {showAvatarPicker ? 'Tutup Pilihan' : '🖼️ Pilih Avatar'}
                         </button>
                       )}
                     </div>
+
+                    {showAvatarPicker && !user && (
+                      <div className="avatar-picker-grid" style={{ 
+                        position: 'absolute', bottom: '100%', right: '0', 
+                        background: 'var(--clr-card)', padding: '16px', borderRadius: 'var(--radius-lg)', 
+                        boxShadow: 'var(--shadow-card)', zIndex: 10, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '12px', width: '280px'
+                      }}>
+                        {PRESET_AVATARS.map((url, idx) => (
+                          <div 
+                            key={idx}
+                            onClick={() => handleSelectAvatar(url)}
+                            style={{
+                              width: '48px', height: '48px', borderRadius: '50%', background: 'var(--clr-surface)', cursor: 'pointer',
+                              border: myPlayer?.avatar === url ? '3px solid var(--clr-primary)' : '2px solid transparent',
+                              padding: '2px', transition: 'all 0.2s'
+                            }}
+                          >
+                            <img src={url} alt={`preset-${idx}`} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                     <div className="waiting-message" style={{ marginTop: '12px' }}>
                       <div className="waiting-dots">
                         <span /><span /><span />
