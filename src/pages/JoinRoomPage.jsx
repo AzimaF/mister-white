@@ -62,7 +62,10 @@ export default function JoinRoomPage() {
             {/* Code input */}
             <div className="join-code-section">
               <label className="code-input-label">Kode Room (6 Karakter)</label>
-              <div className="code-input-wrapper">
+              <div 
+                className="code-input-wrapper"
+                onClick={() => document.getElementById('room-code')?.focus()}
+              >
                 {[0,1,2,3,4,5].map((i) => (
                   <div
                     key={i}
