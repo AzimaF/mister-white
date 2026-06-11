@@ -15,6 +15,7 @@ import {
   forceEndGame,
   submitDiscussVote,
   processDiscussVotes,
+  submitMrWhiteGuess,
 } from '../firebase/game';
 import './GamePage.css';
 
@@ -33,6 +34,7 @@ export default function GamePage() {
   const [timeLeft, setTimeLeft] = useState(null);
   const [timerPaused, setTimerPaused] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [mrWhiteGuessInput, setMrWhiteGuessInput] = useState('');
   const timerRef = useRef(null);
 
   const guestId = sessionStorage.getItem('guestId');
@@ -393,6 +395,66 @@ export default function GamePage() {
     );
   }
 
+  // ---- RENDER: Mr White Guessing ----
+  if (room.status === 'mrwhite_guessing') {
+    const kickedPlayer = room.players?.[room.kickedPlayerId];
+    const isMeKicked = myId === room.kickedPlayerId;
+
+    return (
+      <div className="game-page">
+        <div className="game-deco-1" />
+        <div className="voting-screen" style={{ textAlign: 'center' }}>
+          <div className="result-banner mrwhite-win" style={{ marginBottom: 20 }}>
+            <div className="result-emoji">🕵️</div>
+            <div className="result-title">Mr. White Tertangkap!</div>
+            <div className="result-subtitle">{kickedPlayer?.name} adalah Mr. White!</div>
+          </div>
+
+          <div style={{ background: 'var(--clr-card)', padding: '24px', borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-card)', maxWidth: '500px', margin: '0 auto' }}>
+            {isMeKicked ? (
+              <>
+                <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '16px' }}>
+                  🎯 Kesempatan Terakhir!
+                </div>
+                <p style={{ color: 'var(--clr-text-secondary)', marginBottom: '24px' }}>
+                  Tebak apa kata rahasia yang dimiliki oleh para Civilian! Jika benar, kamu menang!
+                </p>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Ketik tebakanmu di sini..."
+                  value={mrWhiteGuessInput}
+                  onChange={(e) => setMrWhiteGuessInput(e.target.value)}
+                  style={{ marginBottom: '16px', textAlign: 'center', fontSize: '1.1rem' }}
+                />
+                <button
+                  className="btn btn-blue"
+                  style={{ width: '100%' }}
+                  disabled={!mrWhiteGuessInput.trim()}
+                  onClick={() => submitMrWhiteGuess(code, mrWhiteGuessInput)}
+                >
+                  🚀 Kirim Tebakan
+                </button>
+              </>
+            ) : (
+              <>
+                <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '16px' }}>
+                  Menunggu Tebakan Mr. White...
+                </div>
+                <p style={{ color: 'var(--clr-text-secondary)' }}>
+                  Jika {kickedPlayer?.name} berhasil menebak kata kalian, dia yang akan menang!
+                </p>
+                <div className="waiting-dots" style={{ justifyContent: 'center', marginTop: '24px' }}>
+                  <span /><span /><span />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ---- RENDER: Results ----
   if (room.status === 'results' || room.status === 'finished') {
     const kickedPlayer = room.players?.[room.kickedPlayerId];
@@ -462,6 +524,14 @@ export default function GamePage() {
                 <div className="word-item-word">{room.mrWhiteWord || '(Tidak ada kata)'}</div>
               </div>
             </div>
+            {room.mrWhiteGuess && (
+              <div style={{ marginTop: '16px', padding: '16px', background: 'var(--clr-surface)', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                <div style={{ fontWeight: 'bold', marginBottom: '8px', color: 'var(--clr-text-secondary)' }}>Tebakan Mr. White:</div>
+                <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: room.mrWhiteGuessCorrect ? '#059669' : '#DC2626' }}>
+                  "{room.mrWhiteGuess}" {room.mrWhiteGuessCorrect ? '✅ Benar!' : '❌ Salah!'}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Leaderboard */}

@@ -7,8 +7,8 @@ import { categories } from '../data/words';
 import './CreateRoomPage.css';
 
 const defaultSettings = {
-  maxPlayers: 10,
-  mrWhiteCount: 1,
+  maxPlayers: 50,
+  mrWhiteCount: 1, // Ini akan ditimpa secara dinamis nanti di game.js
   wordMode: 'normal',
   language: 'id',
   category: '',
@@ -28,19 +28,7 @@ export default function CreateRoomPage() {
 
   const handleChange = (key, value) => {
     setSettings((prev) => {
-      const nextSettings = { ...prev, [key]: value };
-      
-      if (key === 'maxPlayers') {
-        let maxAllowed = 1;
-        if (value >= 6) maxAllowed = 2;
-        if (value >= 10) maxAllowed = 3;
-        
-        if (nextSettings.mrWhiteCount > maxAllowed) {
-          nextSettings.mrWhiteCount = maxAllowed;
-        }
-      }
-      
-      return nextSettings;
+      return { ...prev, [key]: value };
     });
   };
 
@@ -92,38 +80,6 @@ export default function CreateRoomPage() {
             <div className="settings-card-title">⚙️ Pengaturan Room</div>
 
             <div className="settings-grid">
-              {/* Max Players */}
-              <div className="form-group">
-                <label className="form-label">Maks. Pemain</label>
-                <select
-                  className="form-input form-select"
-                  value={settings.maxPlayers}
-                  onChange={(e) => handleChange('maxPlayers', Number(e.target.value))}
-                >
-                  {[4,6,8,10,12,15,20].map(n => (
-                    <option key={n} value={n}>{n} Pemain</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Mr. White Count */}
-              <div className="form-group">
-                <label className="form-label">Jumlah Mr. White</label>
-                <select
-                  className="form-input form-select"
-                  value={settings.mrWhiteCount}
-                  onChange={(e) => handleChange('mrWhiteCount', Number(e.target.value))}
-                >
-                  {[1,2,3].filter(n => {
-                    if (settings.maxPlayers < 6) return n <= 1;
-                    if (settings.maxPlayers < 10) return n <= 2;
-                    return true;
-                  }).map(n => (
-                    <option key={n} value={n}>{n} Mr. White</option>
-                  ))}
-                </select>
-              </div>
-
               {/* Language */}
               <div className="form-group">
                 <label className="form-label">Bahasa Kata</label>
