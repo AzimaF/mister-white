@@ -24,6 +24,7 @@ export default function GamePage() {
   const [myVote, setMyVote] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [showWord, setShowWord] = useState(false);
+  const [isWordHidden, setIsWordHidden] = useState(true);
   const [timeLeft, setTimeLeft] = useState(null);
   const [timerPaused, setTimerPaused] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -43,6 +44,7 @@ export default function GamePage() {
       setClue('');
       setMyVote(null);
       setShowWord(false);
+      setIsWordHidden(true);
 
       if (data.status === 'lobby') navigate(`/room/${code}`);
     });
@@ -256,7 +258,7 @@ export default function GamePage() {
               <button
                 id="btn-process-votes"
                 className="host-process-btn"
-                onClick={() => processVotes(code, user.uid)}
+                onClick={() => processVotes(code, myId)}
               >
                 🔍 Singkap Hasilnya!
               </button>
@@ -268,7 +270,7 @@ export default function GamePage() {
               <button
                 id="btn-force-process-votes"
                 className="btn btn-outline-white btn-sm"
-                onClick={() => processVotes(code, user.uid)}
+                onClick={() => processVotes(code, myId)}
               >
                 ⏩ Paksa Proses ({votesCast}/{totalVoters} vote)
               </button>
@@ -346,7 +348,7 @@ export default function GamePage() {
             <button
               id="btn-next-round"
               className="next-round-btn"
-              onClick={() => nextRound(code, user.uid)}
+              onClick={() => nextRound(code, myId)}
             >
               🔄 Ronde Berikutnya!
             </button>
@@ -387,9 +389,20 @@ export default function GamePage() {
           <div className="game-left">
             {/* My Word Card */}
             <div className={`my-word-card ${myRole}`}>
-              <div className="my-word-label">Katamu</div>
-              <div className="my-word-text">
-                {myWord || (myRole === 'mrwhite' ? '❓ Tebak dari petunjuk!' : '—')}
+              <div className="my-word-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                Katamu
+                <button 
+                  onClick={() => setIsWordHidden(!isWordHidden)}
+                  style={{ background: 'rgba(0,0,0,0.1)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  title={isWordHidden ? "Lihat Kata" : "Tutup Kata"}
+                >
+                  {isWordHidden ? '👁️' : '🫣'}
+                </button>
+              </div>
+              <div className="my-word-text" style={{ transition: 'all 0.3s' }}>
+                {isWordHidden 
+                  ? '••••••••' 
+                  : (myWord || (myRole === 'mrwhite' ? '❓ Tebak dari petunjuk!' : '—'))}
               </div>
               <div className={`my-word-role ${myRole}`}>
                 {myRole === 'civilian' ? '✅ Kamu adalah Civilian' : '🕵️ Kamu adalah Mr. White'}
@@ -482,7 +495,7 @@ export default function GamePage() {
               <button
                 id="btn-next-turn"
                 className="host-next-btn"
-                onClick={() => nextTurn(code, user.uid)}
+                onClick={() => nextTurn(code, myId)}
               >
                 ⏩ Lanjut Giliran Berikutnya
               </button>
