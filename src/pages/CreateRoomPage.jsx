@@ -7,8 +7,8 @@ import { categories } from '../data/words';
 import './CreateRoomPage.css';
 
 const defaultSettings = {
-  maxPlayers: 50,
-  mrWhiteCount: 1, // Ini akan ditimpa secara dinamis nanti di game.js
+  maxPlayers: 10,
+  mrWhiteCount: 2,
   wordMode: 'normal',
   language: 'id',
   category: '',
@@ -28,7 +28,21 @@ export default function CreateRoomPage() {
 
   const handleChange = (key, value) => {
     setSettings((prev) => {
-      return { ...prev, [key]: value };
+      const nextSettings = { ...prev, [key]: value };
+      
+      if (key === 'maxPlayers') {
+        let maxAllowed = 1;
+        if (value >= 6) maxAllowed = 2;
+        if (value >= 9) maxAllowed = 3;
+        if (value >= 12) maxAllowed = 4;
+        if (value >= 15) maxAllowed = 5;
+        
+        if (nextSettings.mrWhiteCount > maxAllowed) {
+          nextSettings.mrWhiteCount = maxAllowed;
+        }
+      }
+      
+      return nextSettings;
     });
   };
 
@@ -80,6 +94,40 @@ export default function CreateRoomPage() {
             <div className="settings-card-title">⚙️ Pengaturan Room</div>
 
             <div className="settings-grid">
+              {/* Max Players */}
+              <div className="form-group">
+                <label className="form-label">Maks. Pemain</label>
+                <select
+                  className="form-input form-select"
+                  value={settings.maxPlayers}
+                  onChange={(e) => handleChange('maxPlayers', Number(e.target.value))}
+                >
+                  {[4,5,6,7,8,9,10,12,15,20].map(n => (
+                    <option key={n} value={n}>{n} Pemain</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Mr. White Count */}
+              <div className="form-group">
+                <label className="form-label">Jumlah Mr. White</label>
+                <select
+                  className="form-input form-select"
+                  value={settings.mrWhiteCount}
+                  onChange={(e) => handleChange('mrWhiteCount', Number(e.target.value))}
+                >
+                  {[1,2,3,4,5].filter(n => {
+                    if (settings.maxPlayers < 6) return n <= 1;
+                    if (settings.maxPlayers < 9) return n <= 2;
+                    if (settings.maxPlayers < 12) return n <= 3;
+                    if (settings.maxPlayers < 15) return n <= 4;
+                    return true;
+                  }).map(n => (
+                    <option key={n} value={n}>{n} Mr. White</option>
+                  ))}
+                </select>
+              </div>
+
               {/* Language */}
               <div className="form-group">
                 <label className="form-label">Bahasa Kata</label>

@@ -162,18 +162,11 @@ export const startGame = async (roomCode, hostId) => {
   if (room.hostId !== hostId) throw new Error('Hanya host yang bisa memulai!');
 
   const { settings, players } = room;
-  
-  const playerCount = Object.keys(players).length;
-  let dynamicMrWhiteCount = 1;
-  if (playerCount >= 5) dynamicMrWhiteCount = 2;
-  if (playerCount >= 7) dynamicMrWhiteCount = 3;
-  if (playerCount >= 9) dynamicMrWhiteCount = 4;
-  if (playerCount >= 11) dynamicMrWhiteCount = 5;
 
   const { assignments, civilianWord, mrWhiteWord } = assignWords(
     players,
     settings.wordMode,
-    dynamicMrWhiteCount,
+    settings.mrWhiteCount,
     settings.language,
     settings.category
   );
