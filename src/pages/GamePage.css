@@ -926,19 +926,16 @@
 }
 
 .btn-force-end {
-  position: absolute;
-  top: 16px;
-  right: 16px;
   background: var(--clr-red);
   color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: var(--radius-base);
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
   font-weight: bold;
   font-size: 0.85rem;
   cursor: pointer;
-  z-index: 100;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   transition: all 0.2s;
 }
 .btn-force-end:hover {

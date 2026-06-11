@@ -469,23 +469,24 @@ export default function GamePage() {
     <div className="game-page">
       <div className="game-deco-1" />
 
-      {isHost && (
-        <button 
-          className="btn-force-end"
-          onClick={() => {
-            if (window.confirm("Yakin ingin mengakhiri game sekarang? Pemain dengan poin tertinggi akan menang.")) {
-              forceEndGame(code, myId);
-            }
-          }}
-        >
-          🛑 Akhiri Game
-        </button>
-      )}
-
       <div className="game-container">
         {/* Header */}
         <div className="game-header">
-          <div className="game-round-badge">Ronde {room.round}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <div className="game-round-badge">Ronde {room.round}</div>
+            {isHost && (
+              <button 
+                className="btn-force-end"
+                onClick={() => {
+                  if (window.confirm("Yakin ingin mengakhiri game sekarang? Pemain dengan poin tertinggi akan menang.")) {
+                    forceEndGame(code, myId);
+                  }
+                }}
+              >
+                🛑 Akhiri Game
+              </button>
+            )}
+          </div>
           <div className="game-title">🎮 Mister White</div>
           {!isRandomMode && (
             <div className={`my-role-badge ${myRole}`}>
