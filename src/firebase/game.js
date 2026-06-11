@@ -320,14 +320,11 @@ export const processVotes = async (roomCode, hostId) => {
 
   // Jika Civilian yang kena kick:
   const scoreUpdates = {};
-  // Civilian gagal (kick civilian): +30 poin Mr. White, -5 civilian
+  // Civilian gagal (kick civilian): +30 poin Mr. White
   Object.keys(room.players).forEach((pid) => {
     if (assignments[pid]?.role === 'mrwhite') {
       scoreUpdates[`rooms/${roomCode}/players/${pid}/score`] =
         (room.players[pid].score || 0) + 30;
-    } else {
-      scoreUpdates[`rooms/${roomCode}/players/${pid}/score`] =
-        Math.max(0, (room.players[pid].score || 0) - 5);
     }
   });
 
@@ -362,13 +359,11 @@ export const submitMrWhiteGuess = async (roomCode, guess) => {
   const playersArr = Object.values(room.players);
   
   if (isCorrect) {
-    // Mr. White menang karena menebak benar: +30 poin Mr. White, -5 civilian
+    // Mr. White menang karena menebak benar: +30 poin Mr. White
     const scoreUpdates = {};
     Object.keys(room.players).forEach((pid) => {
       if (room.assignments[pid]?.role === 'mrwhite') {
         scoreUpdates[`rooms/${roomCode}/players/${pid}/score`] = (room.players[pid].score || 0) + 30;
-      } else {
-        scoreUpdates[`rooms/${roomCode}/players/${pid}/score`] = Math.max(0, (room.players[pid].score || 0) - 5);
       }
     });
 
@@ -397,8 +392,6 @@ export const submitMrWhiteGuess = async (roomCode, guess) => {
       Object.keys(room.players).forEach((pid) => {
         if (room.assignments[pid]?.role === 'civilian') {
           scoreUpdates[`rooms/${roomCode}/players/${pid}/score`] = (room.players[pid].score || 0) + 20;
-        } else {
-          scoreUpdates[`rooms/${roomCode}/players/${pid}/score`] = Math.max(0, (room.players[pid].score || 0) - 10);
         }
       });
 
