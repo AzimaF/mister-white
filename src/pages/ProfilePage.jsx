@@ -198,7 +198,7 @@ export default function ProfilePage() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            <button type="submit" className="btn btn-outline-white" disabled={loading || !password}>
+            <button type="submit" className="btn btn-primary" disabled={loading || !password}>
               {loading ? 'Menyimpan...' : '🔑 Ubah Password'}
             </button>
           </form>
@@ -206,9 +206,9 @@ export default function ProfilePage() {
 
         <div className="profile-section" style={{ borderBottom: 'none', paddingBottom: 0, marginTop: '24px' }}>
           <button 
-            className="btn btn-outline-white" 
+            className="btn" 
             onClick={handleLogout}
-            style={{ width: '100%', borderColor: '#EF4444', color: '#EF4444' }}
+            style={{ width: '100%', background: '#FEE2E2', color: '#DC2626', fontWeight: 'bold' }}
           >
             🚪 Keluar dari Akun
           </button>
