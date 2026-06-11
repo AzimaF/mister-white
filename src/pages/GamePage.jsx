@@ -13,6 +13,8 @@ import {
   startExtraClueRound,
   startVoting,
   forceEndGame,
+  submitDiscussVote,
+  processDiscussVotes,
 } from '../firebase/game';
 import './GamePage.css';
 
@@ -226,13 +228,19 @@ export default function GamePage() {
 
   // ---- RENDER: Discuss Phase ----
   if (room.status === 'discuss') {
+    const discussVotes = room.discussVotes || {};
+    const myDiscussVote = discussVotes[myId];
+    const votesCast = Object.keys(discussVotes).length;
+    const totalPlayers = players.length;
+
     return (
       <div className="game-page">
         <div className="game-deco-1" />
         <div className="voting-screen">
           <div className="voting-header">
             <div className="voting-title">💬 Sesi Diskusi</div>
-            <div className="voting-subtitle">Semua pemain telah memberikan petunjuk!</div>
+            <div className="voting-subtitle">Apa langkah selanjutnya? (Suara terbanyak yang menang!)</div>
+            <div className="vote-counter">{votesCast}/{totalPlayers} suara terkumpul</div>
           </div>
 
           <div className="clues-recap">
@@ -249,19 +257,25 @@ export default function GamePage() {
             </div>
           </div>
 
-          {isHost ? (
-            <div className="discuss-host-actions" style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+          {!myDiscussVote ? (
+            <div className="discuss-host-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '24px' }}>
               <button
                 className="btn btn-outline-white"
-                style={{ flex: 1 }}
-                onClick={() => startExtraClueRound(code, myId)}
+                style={{ flex: 1, minWidth: '200px' }}
+                onClick={async () => {
+                  await submitDiscussVote(code, myId, 'clue');
+                  if (votesCast + 1 >= totalPlayers) await processDiscussVotes(code);
+                }}
               >
                 🔁 Minta Petunjuk Tambahan
               </button>
               <button
                 className="btn btn-blue"
-                style={{ flex: 1 }}
-                onClick={() => startVoting(code, myId)}
+                style={{ flex: 1, minWidth: '200px' }}
+                onClick={async () => {
+                  await submitDiscussVote(code, myId, 'vote');
+                  if (votesCast + 1 >= totalPlayers) await processDiscussVotes(code);
+                }}
               >
                 🗳️ Mulai Voting Sekarang!
               </button>
@@ -271,7 +285,18 @@ export default function GamePage() {
               <div className="waiting-dots">
                 <span /><span /><span />
               </div>
-              <p>Menunggu Host memutuskan...</p>
+              <p>Pilihanmu terkirim! Menunggu pemain lain...</p>
+            </div>
+          )}
+
+          {isHost && votesCast > 0 && votesCast < totalPlayers && (
+            <div style={{ textAlign: 'center', marginTop: 16 }}>
+              <button
+                className="btn btn-outline-white btn-sm"
+                onClick={() => processDiscussVotes(code)}
+              >
+                ⏩ Paksa Hitung Suara
+              </button>
             </div>
           )}
         </div>

@@ -189,29 +189,56 @@ export const nextTurn = async (roomCode) => {
 };
 
 // Mulai putaran petunjuk tambahan
-export const startExtraClueRound = async (roomCode, hostId) => {
+export const startExtraClueRound = async (roomCode) => {
   const snapshot = await get(ref(db, `rooms/${roomCode}`));
   const room = snapshot.val();
-  if (room.hostId !== hostId) throw new Error('Hanya host yang bisa lanjut!');
 
   await update(ref(db, `rooms/${roomCode}`), {
     status: 'playing',
     currentTurnIndex: 0,
     clueRound: (room.clueRound || 1) + 1,
     timerStart: Date.now(),
+    discussVotes: null,
   });
 };
 
 // Lanjut ke fase voting dari diskusi
-export const startVoting = async (roomCode, hostId) => {
+export const startVoting = async (roomCode) => {
   const snapshot = await get(ref(db, `rooms/${roomCode}`));
   const room = snapshot.val();
-  if (room.hostId !== hostId) throw new Error('Hanya host yang bisa mulai voting!');
 
   await update(ref(db, `rooms/${roomCode}`), {
     status: 'voting',
     timerStart: Date.now(),
+    discussVotes: null,
   });
+};
+
+// Submit vote diskusi (tambah petunjuk vs mulai voting)
+export const submitDiscussVote = async (roomCode, playerId, choice) => {
+  await set(ref(db, `rooms/${roomCode}/discussVotes/${playerId}`), choice);
+};
+
+// Proses hasil vote diskusi
+export const processDiscussVotes = async (roomCode) => {
+  const snapshot = await get(ref(db, `rooms/${roomCode}`));
+  const room = snapshot.val();
+  if (!room || room.status !== 'discuss') return;
+
+  const votes = room.discussVotes || {};
+  let clueVotes = 0;
+  let voteVotes = 0;
+
+  Object.values(votes).forEach(choice => {
+    if (choice === 'clue') clueVotes++;
+    if (choice === 'vote') voteVotes++;
+  });
+
+  if (clueVotes >= voteVotes) {
+    await startExtraClueRound(roomCode);
+  } else {
+    await startVoting(roomCode);
+  }
 };
 
 // Submit vote
