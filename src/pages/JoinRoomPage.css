@@ -1,0 +1,204 @@
+/* src/pages/JoinRoomPage.css — Bright style */
+
+.join-page {
+  min-height: 100vh;
+  background: var(--clr-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorations */
+.join-deco-1 {
+  position: fixed;
+  width: 250px; height: 250px;
+  background: var(--clr-green);
+  opacity: 0.12;
+  top: -80px; right: -60px;
+  border-radius: 40% 60% 30% 70%;
+  animation: blob-move 9s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.join-deco-2 {
+  position: fixed;
+  width: 180px; height: 180px;
+  background: var(--clr-yellow);
+  opacity: 0.12;
+  bottom: -50px; left: -50px;
+  border-radius: 60% 40% 50% 30%;
+  animation: blob-move 7s ease-in-out infinite reverse;
+  pointer-events: none;
+}
+
+.join-container {
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  z-index: 1;
+  animation: fadeInUp 0.45s ease both;
+}
+
+/* Logo */
+.join-logo {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.join-logo-icon {
+  font-size: 2.8rem;
+  display: block;
+  margin-bottom: var(--space-sm);
+  animation: float 3s ease-in-out infinite;
+}
+
+.join-logo-name {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--clr-white);
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.join-logo-sub {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.75);
+  font-weight: 500;
+}
+
+/* Card */
+.join-card {
+  background: var(--clr-white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-card);
+}
+
+.join-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Code Input */
+.join-code-section {
+  position: relative;
+}
+
+.code-input-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--clr-text-secondary);
+  margin-bottom: 10px;
+  display: block;
+}
+
+.code-input-wrapper {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: var(--space-sm);
+  position: relative;
+}
+
+.code-box {
+  width: 52px;
+  height: 60px;
+  border-radius: var(--radius-md);
+  background: var(--clr-surface);
+  border: 2.5px solid var(--clr-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--clr-text);
+  transition: var(--transition-base);
+  user-select: none;
+  font-family: var(--font-primary);
+}
+
+.code-box.filled {
+  background: #EEF4FF;
+  border-color: var(--clr-bg);
+  color: var(--clr-bg);
+}
+
+.code-box.active {
+  border-color: var(--clr-bg);
+  background: #EEF4FF;
+  box-shadow: 0 0 0 3px rgba(30,144,232,0.15);
+}
+
+.code-hidden-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: text;
+  width: 100%;
+  height: 100%;
+  font-size: 0;
+}
+
+.join-submit {
+  width: 100%;
+  padding: 14px;
+  font-size: 0.95rem;
+  background: var(--clr-bg);
+  color: white;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.join-submit:hover:not(:disabled) {
+  background: var(--clr-bg-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-btn);
+}
+
+.join-submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Footer */
+.join-footer {
+  text-align: center;
+  margin-top: var(--space-lg);
+  font-size: 0.875rem;
+  color: rgba(255,255,255,0.8);
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.join-footer span {
+  color: var(--clr-white);
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.join-footer span:hover {
+  color: var(--clr-yellow);
+}
+
+@media (max-width: 480px) {
+  .code-box {
+    width: 44px;
+    height: 54px;
+    font-size: 1.3rem;
+  }
+}

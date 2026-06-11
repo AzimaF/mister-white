@@ -1,0 +1,213 @@
+/* src/pages/CreateRoomPage.css — Bright style */
+
+.create-page {
+  min-height: 100vh;
+  background: var(--clr-bg);
+  padding: var(--space-lg) var(--space-lg) var(--space-3xl);
+}
+
+/* Decorations */
+.create-deco-1 {
+  position: fixed;
+  width: 300px; height: 300px;
+  background: rgba(255,255,255,0.06);
+  top: -80px; right: -80px;
+  border-radius: 60% 40% 30% 70%;
+  animation: blob-move 9s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.create-container {
+  max-width: 740px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* Header */
+.create-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+  padding-top: var(--space-sm);
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.create-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--clr-white);
+  letter-spacing: -0.02em;
+}
+
+.create-host-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: var(--radius-full);
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--clr-white);
+}
+
+.create-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: var(--radius-full);
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--clr-white);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.create-back-btn:hover {
+  background: rgba(255,255,255,0.22);
+}
+
+/* Form */
+.create-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  animation: fadeInUp 0.4s ease both;
+}
+
+/* Settings card */
+.settings-card {
+  background: var(--clr-white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-card);
+}
+
+.settings-card-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--clr-text);
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 2px solid var(--clr-border);
+  letter-spacing: -0.01em;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-md);
+}
+
+/* Word Mode */
+.word-mode-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.word-mode-option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 2.5px solid var(--clr-border);
+  cursor: pointer;
+  transition: var(--transition-base);
+  background: var(--clr-surface);
+  position: relative;
+}
+
+.word-mode-option input[type="radio"] { display: none; }
+
+.word-mode-option:hover {
+  border-color: #BFDBFE;
+  background: #F0F7FF;
+}
+
+.word-mode-option.selected {
+  border-color: var(--clr-bg);
+  background: #EEF4FF;
+}
+
+.word-mode-option.selected::after {
+  content: '✓';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  background: var(--clr-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: white;
+}
+
+.word-mode-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.word-mode-name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--clr-text);
+  margin-bottom: 3px;
+}
+
+.word-mode-desc {
+  font-size: 0.84rem;
+  color: var(--clr-text-secondary);
+  line-height: 1.5;
+}
+
+/* Submit */
+.create-submit {
+  width: 100%;
+  padding: 16px;
+  font-size: 1rem;
+  background: var(--clr-white);
+  color: var(--clr-text);
+  border-radius: var(--radius-full);
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: var(--shadow-card);
+}
+
+.create-submit:hover:not(:disabled) {
+  background: var(--clr-text);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.create-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .create-header { flex-direction: column; align-items: flex-start; }
+  .settings-grid { grid-template-columns: 1fr; }
+}
